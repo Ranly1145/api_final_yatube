@@ -1,8 +1,8 @@
 from http import HTTPStatus
 
 from django.db.utils import IntegrityError
-import pytest
 
+import pytest
 from posts.models import Comment
 
 
