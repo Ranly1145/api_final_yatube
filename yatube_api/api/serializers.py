@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import BadRequest
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from posts.models import Comment, Follow, Group, Post
 
@@ -52,15 +52,12 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'user', 'following')
         model = Follow
-        validators = [
-            UniqueTogetherValidator(
-                queryset=User.objects.all(),
-                fields=['user', 'following'],
-                message='Повторная подписка невозможна!'
-            )
-        ]
 
     def validate(self, data):
-        if self.context['request'].user == data['following']:
+        user = self.context['request'].user
+        following = data['following']
+        if user == following:
             raise serializers.ValidationError('Подписка на себя невозможна!')
+        if user.follows.filter(following=following):
+            raise BadRequest('Вы уже подписаны на этого пользователя!')
         return data
