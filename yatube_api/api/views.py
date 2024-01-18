@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404
+
 from rest_framework import filters, permissions, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
 from posts.models import Group, Post
-
+from .mixins import CreateListViewSet
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
-from .utils import CreateListViewSet
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -50,5 +50,4 @@ class FollowViewSet(CreateListViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        user = self.request.user
-        return user.follows.all()
+        return self.request.user.follows.all()
